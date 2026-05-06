@@ -9,4 +9,4 @@ Hi, I'm Priya Kuril — a passionate Web Developer & Data Analyst who loves buil
 
 🚀 Interested in: Web apps, dashboards, and real-world problem solving
 
-📫 Reach me: kurilpriya75@gmail.com
+📫 Reach me: educatengneer235@gmail.com
