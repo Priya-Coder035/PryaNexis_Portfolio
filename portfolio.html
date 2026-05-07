@@ -27,6 +27,7 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
+            
         }
 
         /* Custom Scrollbar */
@@ -658,13 +659,16 @@
                         </div>
                     </div>
 
-                    <form id="contactForm" class="space-y-4">
+                    <form id="contactForm" 
+                        action="api/contact.php" 
+                        method="POST" 
+                        class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <input type="text" placeholder="First Name" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all">
-                            <input type="text" placeholder="Last Name" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all">
+                            <input type="text" name="first_name" placeholder="First Name" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all">
+                            <input type="text" name="last_name" placeholder="Last Name" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all">
                         </div>
-                        <input type="email" placeholder="Email Address" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all">
-                        <textarea rows="5" placeholder="Project Details..." class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all resize-none"></textarea>
+                        <input type="email"   name="email" placeholder="Email Address" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all">
+                        <textarea rows="5" name="message" placeholder="Project Details..." class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-6 py-4 focus:border-blue-500 outline-none transition-all resize-none"></textarea>
                         <button type="submit" class="w-full py-5 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold text-white transition-all transform hover:-translate-y-1 shadow-xl shadow-blue-600/20">
                             Send Message <i class="fas fa-paper-plane ml-2"></i>
                         </button>
@@ -832,7 +836,7 @@
             const message = form.querySelector('textarea')?.value?.trim() || '';
 
             try {
-                const res = await fetch('http://localhost:8000/api/contact', {
+const res = await fetch('api/contact.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -846,9 +850,17 @@
                 });
 
                 if (!res.ok) {
-                    const errText = await res.text().catch(() => '');
+                    let serverError = '';
+                    try {
+                        const data = await res.json();
+                        serverError = data?.error ? String(data.error) : '';
+                    } catch (e) {
+                        // ignore json parse errors
+                    }
+                    const errText = serverError || (await res.text().catch(() => ''));
                     throw new Error(`Request failed (${res.status}). ${errText}`);
                 }
+
 
                 btn.innerHTML = 'Success! <i class="fas fa-check ml-2"></i>';
                 btn.classList.remove('bg-blue-600');
@@ -863,7 +875,7 @@
                 }, 2500);
             } catch (err) {
                 console.error(err);
-                btn.innerHTML = 'Failed. Try again <i class="fas fa-triangle-exclamation ml-2"></i>';
+                btn.innerHTML = 'Failed to try again <i class="fas fa-triangle-exclamation ml-2"></i>';
                 btn.classList.remove('bg-blue-600');
                 btn.classList.add('bg-red-600');
 
